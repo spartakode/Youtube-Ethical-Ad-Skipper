@@ -3,7 +3,7 @@ watching = false;
 currentURL = "";
 skipperStarted = false;
 tID = null;
-readyID = null;
+videoTitle = null;
 
 skipAdAutomatically = function(){ 
 
@@ -46,11 +46,11 @@ skipAdAutomatically = function(){
     play_button.click();
     currentTimeElement = document.getElementsByClassName('ytp-progress-bar')[0];
     totalTime = parseInt(currentTimeElement.getAttribute('aria-valuemax'));
-    console.log("total time");
-    console.log(totalTime);
+    //console.log("total time");
+    //console.log(totalTime);
     play_button.click();
     if (totalTime < 31){
-      console.log("short ad but skippable");
+      //console.log("short ad but skippable");
       visit_advertiser_link = document.getElementsByClassName('videoAdUiVisitAdvertiserLinkText')[0];
       if (visit_advertiser_link == null){
         if (muteButton.getAttribute("title") == "Unmute"){
@@ -58,11 +58,10 @@ skipAdAutomatically = function(){
         }
         window.clearInterval(tID);
         tID = null;
-        console.log("video too short");
       }
     }
     else{
-      console.log("long ad and skippable");
+      //console.log("long ad and skippable");
       currentTime = currentTimeElement.getAttribute('aria-valuenow');
       //console.log(currentTime);
       if (parseInt(currentTime)>31){
@@ -89,16 +88,13 @@ console.log("testing");
 //skipAdAutomatically();
 
 watcher = window.setInterval(function(){  
+  videoTitle = null;
   if (watchRe.exec(window.location.href) == null){
     //console.log("not watching video");
     currentURL = "";
     if (tID != null){
       window.clearInterval(tID);
       tID = null;
-    }
-    if(readyID != null){
-      window.clearInterval(readyID);
-      readyID = null;
     }
   }
   else{
@@ -111,19 +107,17 @@ watcher = window.setInterval(function(){
         window.clearInterval(tID);
         tID = null;
       }
-      if(readyID != null){
-        window.clearInterval(readyID);
-        readyID = null;
-      }
       //console.log("finding the mute button");
-      muteButton = document.getElementsByClassName('ytp-mute-button')[0];
-      //console.log(muteButton);
-      if (muteButton != null){
-        window.clearInterval(readyID);
-        readyID = null;
-        w = window.setTimeout(skipAdAutomatically, 2000);
-        //console.log(w);
-      }
+      waitForVideo = window.setInterval(function(){
+        videoTitle = document.getElementById("eow-title");
+        console.log("video title");
+        console.log(videoTitle);
+        if (videoTitle != null){
+          console.log("starting skipper");
+          window.clearInterval(waitForVideo);
+          w = window.setTimeout(skipAdAutomatically, 2000);
+        }
+      }, 1000)
     }
   }
 }, 1000);
